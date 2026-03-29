@@ -29,8 +29,25 @@ function Quiz() {
       setCurrent(current + 1);
       setSelected(null);
     } else {
-      setFinished(true);
+      finishQuiz();
     }
+  };
+
+  const finishQuiz = async () => {
+    const username = localStorage.getItem('username');
+    if (username) {
+      try {
+        await axios.post('http://localhost:8080/api/scores', {
+          username,
+          score,
+          total: questions.length,
+          quizId: parseInt(id)
+        });
+      } catch (err) {
+        console.error('Failed to save score', err);
+      }
+    }
+    setFinished(true);
   };
 
   if (finished) {
@@ -38,7 +55,7 @@ function Quiz() {
       <div style={styles.container}>
         <h1 style={styles.title}>Quiz Complete!</h1>
         <p style={styles.score}>Your score: {score} / {questions.length}</p>
-        <button style={styles.button} onClick={() => navigate('/')}>
+        <button style={styles.button} onClick={() => navigate('/home')}>
           Back to Home
         </button>
       </div>
@@ -89,22 +106,15 @@ const styles = {
   question: { fontSize: '1.3rem', marginBottom: '1.5rem', color: '#1a1a2e' },
   options: { display: 'flex', flexDirection: 'column', gap: '0.75rem' },
   option: {
-    padding: '0.75rem 1rem',
-    borderRadius: '8px',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    textAlign: 'left',
+    padding: '0.75rem 1rem', borderRadius: '8px',
+    border: 'none', cursor: 'pointer',
+    fontSize: '1rem', textAlign: 'left',
   },
   button: {
-    marginTop: '1.5rem',
-    padding: '0.75rem 1.5rem',
-    background: '#e94560',
-    color: 'white',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '1rem',
+    marginTop: '1.5rem', padding: '0.75rem 1.5rem',
+    background: '#e94560', color: 'white',
+    border: 'none', borderRadius: '8px',
+    cursor: 'pointer', fontSize: '1rem',
   }
 };
 
